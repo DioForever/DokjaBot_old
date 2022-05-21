@@ -133,7 +133,6 @@ def getTime(rHour, rMinute, rDay):
     # Time in seconds until release
     countdown_left = int((rHour * 60 * 60 + rMinute * 60 - time_sec) / 60 + rDay * 24 * 60)
     negative = True
-    negative = True
     if countdown_left>0:
         negative = False
 
