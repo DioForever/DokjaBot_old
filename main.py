@@ -227,7 +227,7 @@ async def myLoop():
                                        "https://reaperscans.com/series/the-challenger/https://reaperscans.com/series/the-challenger/",
                                        "https://reaperscans.com/series/the-challenger/chapter-", 246, 214, 4)
         await channel.send(embed=embed)
-        await channel.send(f'Ping of The Challenger {number_chapter_challenger}: {subscription}')
+        await channel.send(f'Ping of The Challenger {number_chapter_challenger}: {subscription}',delete_after=3)
     if last_chapters["The Great Mage Returns After 4000 Years"] < number_chapter_mage_returns:
         last_chapters["The Great Mage Returns After 4000 Years"] = number_chapter_mage_returns
         new_chapter = f"The Great Mage Returns After 4000 Years has a new chapter {number_chapter_mage_returns}!"
@@ -238,7 +238,7 @@ async def myLoop():
                                        "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/chapter-",
                                        93, 0, 174)
         await channel.send(embed=embed)
-        await channel.send(f'Ping of The Great Mage Returns After 4000 Years {number_chapter_mage_returns}: {subscription}')
+        await channel.send(f'Ping of The Great Mage Returns After 4000 Years {number_chapter_mage_returns}: {subscription}',delete_after=3)
     if last_chapters["Is this Hero for Real?"] < number_chapter_hero_for_real:
         last_chapters["Is this Hero for Real?"] = number_chapter_hero_for_real
         new_chapter = f"Is this Hero for Real? has a new chapter {number_chapter_archmage_streamer}!"
@@ -314,7 +314,6 @@ def getTime(rHour, rMinute, rDay):
     message_finall = f"{days_r} days  {hour_r} hours {min_r} minutes"
 
     return message_finall, negative
-
 
 def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
     web = r.get(url=urlbasic)
