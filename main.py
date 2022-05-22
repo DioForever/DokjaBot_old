@@ -7,6 +7,7 @@ import requests as r
 from bs4 import BeautifulSoup as bs
 from discord.ext import commands
 
+
 bot = commands.Bot(command_prefix="!")
 
 
@@ -31,16 +32,18 @@ async def supl(ctx):
 
 @bot.command()
 async def m_list(ctx):
-    all = ("\n  The Beginning after the end - !m_tbate \n"+
-           "    The Challenger - !m_the_challenger \n"+
-           "    Is this Hero for Real? - !m_hero_for_real \n"+
-           "    Archmage Streamer - !m_archmage_streamer \n"+
-           "    FFF-Class Trashero - !m_fth \n"+
+    all = ("\n  The Beginning after the end - !m_tbate \n" +
+           "    The Challenger - !m_the_challenger \n" +
+           "    Is this Hero for Real? - !m_hero_for_real \n" +
+           "    Archmage Streamer - !m_archmage_streamer \n" +
+           "    FFF-Class Trashero - !m_fth \n" +
            "    The Great Mage Returns After 4000 Years - !m_mage_returns \n")
     embed = discord.Embed(title=f"List of Manhwas/Mangas",
                           description=f"The list of commands for \n " + "Manhwas and Mangas in system" + f"\n {all}",
                           color=discord.Color.from_rgb(246, 214, 4))
     await ctx.send(embed=embed)
+
+
 @bot.command()
 async def m_tbate(ctx):
     TBATE_Web = r.get("https://beginningafterend.com/?2022-05%3F2022-05-20")
@@ -84,6 +87,8 @@ async def m_tbate(ctx):
                           color=discord.Color.from_rgb(5, 77, 17))
     embed.set_image(url="https://digitalcrime.news/wp-content/uploads/2022/03/a-221.jpg")
     await ctx.send(embed=embed)
+
+
 @bot.command()
 async def m_fth(ctx):
     FFF_Web = r.get("https://manhuazone.com/manga/5-fff-class-tras-hero/")
@@ -116,27 +121,103 @@ async def m_fth(ctx):
                           color=discord.Color.from_rgb(167, 14, 191))
     embed.set_image(url="https://i0.hdslb.com/bfs/comic-static/70c263ce2dffe3fdd94369955d0c2bc6cde0c70b.png@600w.jpg")
     await ctx.send(embed=embed)
+
+
 @bot.command()
 async def m_archmage_streamer(ctx):
-    embed = getReaperScans("Archmage Streamer","https://reaperscans.com/series/archmage-streamer/", "https://reaperscans.com/series/archmage-streamer/chapter-",0,180,246,18,0,4)
+    embed = getReaperScans("Archmage Streamer", "https://reaperscans.com/series/archmage-streamer/",
+                           "https://reaperscans.com/series/archmage-streamer/chapter-", 0, 180, 246, 18, 0, 4)[0]
     await ctx.send(embed=embed)
+
+
 @bot.command()
 async def m_hero_for_real(ctx):
-    embed = getReaperScans("Is this Hero for Real?","https://reaperscans.com/series/is-this-hero-for-real/", "https://reaperscans.com/series/is-this-hero-for-real/chapter-",0,0,0,18,0,0)
+    embed = getReaperScans("Is this Hero for Real?", "https://reaperscans.com/series/is-this-hero-for-real/",
+                           "https://reaperscans.com/series/is-this-hero-for-real/chapter-", 0, 0, 0, 18, 0, 0)[0]
     await ctx.send(embed=embed)
+
+
 @bot.command()
 async def m_mage_returns(ctx):
-    embed = getReaperScans("The Great Mage Returns After 4000 Years","https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/", "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/chapter-",93,0,174,18,0,3)
+    embed = getReaperScans("The Great Mage Returns After 4000 Years",
+                           "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/",
+                           "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/chapter-", 93,
+                           0, 174, 18, 0, 3)[0]
     await ctx.send(embed=embed)
+
+
 @bot.command()
 async def m_the_challenger(ctx):
-    embed = getReaperScans("The Challenger","https://reaperscans.com/series/the-challenger/https://reaperscans.com/series/the-challenger/", "https://reaperscans.com/series/the-challenger/chapter-",246,214,4,18,0,3)
+    embed = getReaperScans("The Challenger",
+                           "https://reaperscans.com/series/the-challenger/https://reaperscans.com/series/the-challenger/",
+                           "https://reaperscans.com/series/the-challenger/chapter-", 246, 214, 4, 18, 0, 3)[0]
     await ctx.send(embed=embed)
-@tasks.loop(seconds=10)  # repeat after every 10 seconds
-async def myLoop():
-    # work
 
-    print("Finished iterating in: " + " seconds")
+
+last_chapters = {
+    "The Challenger": 0,
+    "The Great Mage Returns After 4000 Years": 0,
+    "Is this Hero for Real?": 0,
+    "Archmage Streamer": 0,
+    "tbate": 0,
+    "fff_trashero": 0,
+
+}
+
+
+
+
+@tasks.loop(seconds=60)  # repeat after every 10 seconds
+async def myLoop():
+    await bot.wait_until_ready()
+    channel = bot.get_channel(977231331199164466)
+
+    number_chapter_challenger = getReaperScans("The Challenger",
+                                               "https://reaperscans.com/series/the-challenger/https://reaperscans.com/series/the-challenger/",
+                                               "https://reaperscans.com/series/the-challenger/chapter-", 246, 214, 4,
+                                               18, 0, 3)[1]
+    number_chapter_mage_returns = getReaperScans("The Great Mage Returns After 4000 Years",
+                                                 "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/",
+                                                 "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/chapter-",
+                                                 93, 0, 174, 18, 0, 3)[1]
+    number_chapter_hero_for_real = \
+        getReaperScans("Is this Hero for Real?", "https://reaperscans.com/series/is-this-hero-for-real/",
+                       "https://reaperscans.com/series/is-this-hero-for-real/chapter-", 0, 0, 0, 18, 0, 0)[1]
+    number_chapter_archmage_streamer = \
+        getReaperScans("Archmage Streamer", "https://reaperscans.com/series/archmage-streamer/",
+                       "https://reaperscans.com/series/archmage-streamer/chapter-", 0, 180, 246, 18, 0, 4)[1]
+
+    if last_chapters["The Challenger"] < number_chapter_challenger:
+        last_chapters["The Challenger"] = number_chapter_challenger
+        new_chapter = f"The Challenger has a new chapter {number_chapter_challenger}!"
+        print(new_chapter)
+        embed = getReaperScansReleased("The Challenger",
+                                       "https://reaperscans.com/series/the-challenger/https://reaperscans.com/series/the-challenger/",
+                                       "https://reaperscans.com/series/the-challenger/chapter-", 246, 214, 4)
+        await channel.send(embed=embed)
+    if last_chapters["The Great Mage Returns After 4000 Years"] < number_chapter_mage_returns:
+        last_chapters["The Great Mage Returns After 4000 Years"] = number_chapter_mage_returns
+        new_chapter = f"The Great Mage Returns After 4000 Years has a new chapter {number_chapter_mage_returns}!"
+        print(new_chapter)
+        embed = getReaperScansReleased("The Great Mage Returns After 4000 Years",
+                                       "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/",
+                                       "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/chapter-",
+                                       93, 0, 174)
+        await channel.send(embed=embed)
+    if last_chapters["Is this Hero for Real?"] < number_chapter_hero_for_real:
+        last_chapters["Is this Hero for Real?"] = number_chapter_hero_for_real
+        new_chapter = f"Is this Hero for Real? has a new chapter {number_chapter_archmage_streamer}!"
+        print(new_chapter)
+        embed = getReaperScansReleased("Is this Hero for Real?", "https://reaperscans.com/series/is-this-hero-for-real/",
+                               "https://reaperscans.com/series/is-this-hero-for-real/chapter-", 0, 0, 0)
+        await channel.send(embed=embed)
+    if last_chapters["Archmage Streamer"] < number_chapter_archmage_streamer:
+        last_chapters["Archmage Streamer"] = number_chapter_archmage_streamer
+        new_chapter = f"Archmage Streamer has a new chapter {number_chapter_archmage_streamer}!"
+        print(new_chapter)
+        embed = getReaperScansReleased("Archmage Streamer", "https://reaperscans.com/series/archmage-streamer/",
+                               "https://reaperscans.com/series/archmage-streamer/chapter-", 0, 180, 246)
+        await channel.send(embed=embed)
 
 
 def getTime(rHour, rMinute, rDay):
@@ -152,7 +233,7 @@ def getTime(rHour, rMinute, rDay):
     # Time in seconds until release
     countdown_left = int((rHour * 60 * 60 + rMinute * 60 - time_sec) / 60 + rDay * 24 * 60)
     negative = True
-    if countdown_left>0:
+    if countdown_left > 0:
         negative = False
 
     if countdown_left <= 0:
@@ -174,7 +255,7 @@ def getTime(rHour, rMinute, rDay):
     return message_finall, negative
 
 
-def getReaperScans(Title, urlbasic, urlchapter,r1,g,b,rHour,rMin,rDay):
+def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
     web = r.get(url=urlbasic)
     chapter_number = 0
     soup = bs(web.content)
@@ -196,26 +277,26 @@ def getReaperScans(Title, urlbasic, urlchapter,r1,g,b,rHour,rMin,rDay):
     released_today = False
 
     second_chapter = soup.find_all("span", class_="chapter-release-date")
-    date_second_chapter = str(second_chapter[1]).replace("</i> </span>","")
+    date_second_chapter = str(second_chapter[1]).replace("</i> </span>", "")
     date_second_chapter = str(date_second_chapter).split('>')
     date_second_chapter = date_second_chapter[2]
     digit = (date_second_chapter.split())
     digit = (digit[1])
-    digit = digit.replace(",","")
+    digit = digit.replace(",", "")
     digit = int(digit)
     digit += 7
     word = (date_second_chapter.split())[1]
-    date_last_chapter = date_second_chapter.replace(word,str(digit))
+    date_last_chapter = date_second_chapter.replace(word, str(digit))
     date_now = datetime.date(datetime.today())
     date_now = date_now.strftime('%b %d, %Y')
-    if date_now==date_second_chapter:
+    if date_now == date_second_chapter:
         released_today = True
 
-    if getTime(rHour,rMin,rDay)[1] is True and released_today is True:
+    if getTime(rHour, rMin, rDay)[1] is True and released_today is True:
         message_release = f"The chapter is being translated or is on a break"
     else:
         chapter_number += 1
-        message_release = f"The Chapter {chapter_number} will be released in {getTime(rHour,rMin,rDay)[0]}"
+        message_release = f"The Chapter {chapter_number} will be released in {getTime(rHour, rMin, rDay)[0]}"
         chapter_number -= 1
     # Now display it
 
@@ -223,9 +304,51 @@ def getReaperScans(Title, urlbasic, urlchapter,r1,g,b,rHour,rMin,rDay):
                           description=f"The Chapter {chapter_number} \n " + message_release + f"\n Link to latest chapter: {urlchapter}",
                           color=discord.Color.from_rgb(r1, g, b))
     embed.set_image(url=f"{url_thumbnail}")
+    return embed, chapter_number
+
+def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
+    web = r.get(url=urlbasic)
+    chapter_number = 0
+    soup = bs(web.content)
+    chapter = soup.find("li", class_="wp-manga-chapter")
+    thumbnail_text = str(chapter.find("img", class_="thumb"))
+    thumbnail_text = thumbnail_text.split('"')
+    url_thumbnail = thumbnail_text[len(thumbnail_text) - 2]
+    # Now I have the thumbnail
+
+    # Now I need the chapter number
+    chapter_text = str(chapter.find("p", class_="chapter-manhwa-title")).split()
+    chapter_number = int(str(chapter_text[2]).split('<')[0])
+    # Now I have the number as well
+
+    urlchapter = f"https://reaperscans.com/series/archmage-streamer/chapter-{chapter_number}/"
+
+    # Now get the time of release and if it already was released today or not
+
+    chapters_released = ""
+    if last_chapters[Title]-chapter_number!=-1:
+        #It has more than 1 released chapter at once, so it was mass release or somethin like that
+        for number in range(last_chapters[Title],chapter_number+1):
+            chapters_released+= str(number)+", "
+        message_release = f"The Chapters {chapters_released} was released!"
+    else:
+        message_release = f"The Chapter {chapters_released} was released!"
+    # Now display it
+
+    if len(chapters_released)>1:
+        embed = discord.Embed(title=f"{Title}", url=f"{urlbasic}",
+                          description=f"{message_release} \n Link to latest chapter: {urlchapter}",
+                          color=discord.Color.from_rgb(r1, g, b))
+        embed.set_image(url=f"{url_thumbnail}")
+    else:
+        embed = discord.Embed(title=f"{Title}", url=f"{urlbasic}",
+                          description=f"{message_release} \n Link to the chapter: {urlchapter}",
+                          color=discord.Color.from_rgb(r1, g, b))
+        embed.set_image(url=f"{url_thumbnail}")
     return embed
 
 
 
-# myLoop.start()
+
+myLoop.start()
 bot.run('ODg3Mzc4NzM3MTQ5MTQ1MTI4.GKxdP8.yh1GiPrn7OZdr6smO4s3TkeLn_RIFdlcI-Ll68')
