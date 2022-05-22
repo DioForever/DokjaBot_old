@@ -65,7 +65,7 @@ async def m_list(ctx):
 @bot.command()
 async def m_tbate(ctx):
     TBATE_Web = r.get("https://beginningafterend.com/?2022-05%3F2022-05-20")
-    soupTBATE = bs(TBATE_Web.content)
+    soupTBATE = bs(TBATE_Web.content, features="html.parser")
     date = datetime.today().strftime("%Y-%m-%d")
 
     chapterTBATE = soupTBATE.find("li", class_="su-post")
@@ -80,7 +80,7 @@ async def m_tbate(ctx):
 
     url_chapter = "https://beginningafterend.com/manga/the-beginning-after-the-end-chapter-" + chapter_number + "/?" + date
     web_Chapter = r.get(url_chapter)
-    soup_Chapter = bs(web_Chapter.content)
+    soup_Chapter = bs(web_Chapter.content, features="html.parser")
     headers2 = soup_Chapter.find("div", class_="tickcounter")
     today_bool = False
     date_split = url_chapter.split('?')
@@ -110,7 +110,7 @@ async def m_tbate(ctx):
 @bot.command()
 async def m_fth(ctx):
     FFF_Web = r.get("https://manhuazone.com/manga/5-fff-class-tras-hero/")
-    soupFFF = bs(FFF_Web.content)
+    soupFFF = bs(FFF_Web.content, features="html.parser")
     chapterFFF = soupFFF.find("li", class_="wp-manga-chapter")
     a_text = chapterFFF.find("a")
     chapter_number = 0
@@ -126,7 +126,7 @@ async def m_fth(ctx):
 
     url_chapter = f"https://ww2.fff-classtrashero.com/manga/fff-class-trashero-chapter-{chapter_number}/"
     web_Chapter = r.get(url_chapter)
-    soup_Chapter = bs(web_Chapter.content)
+    soup_Chapter = bs(web_Chapter.content, features="html.parser")
     date_split = url_chapter.split('?')
     date_length = len(date_split)
     chapter_number = int(chapter_number) + 1
@@ -299,7 +299,7 @@ def getTime(rHour, rMinute, rDay):
 def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
     web = r.get(url=urlbasic)
     chapter_number = 0
-    soup = bs(web.content)
+    soup = bs(web.content, features="html.parser")
     chapter = soup.find("li", class_="wp-manga-chapter")
     thumbnail_text = str(chapter.find("img", class_="thumb"))
     thumbnail_text = thumbnail_text.split('"')
@@ -350,7 +350,7 @@ def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
 def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
     web = r.get(url=urlbasic)
     chapter_number = 0
-    soup = bs(web.content)
+    soup = bs(web.content, features="html.parser")
     chapter = soup.find("li", class_="wp-manga-chapter")
     thumbnail_text = str(chapter.find("img", class_="thumb"))
     thumbnail_text = thumbnail_text.split('"')
