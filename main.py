@@ -227,7 +227,7 @@ async def myLoop():
                                        "https://reaperscans.com/series/the-challenger/https://reaperscans.com/series/the-challenger/",
                                        "https://reaperscans.com/series/the-challenger/chapter-", 246, 214, 4)
         await channel.send(embed=embed)
-        await channel.send(f'Ping: {subscription}')
+        await channel.send(f'Ping of The Challenger {number_chapter_challenger}: {subscription}')
     if last_chapters["The Great Mage Returns After 4000 Years"] < number_chapter_mage_returns:
         last_chapters["The Great Mage Returns After 4000 Years"] = number_chapter_mage_returns
         new_chapter = f"The Great Mage Returns After 4000 Years has a new chapter {number_chapter_mage_returns}!"
@@ -238,7 +238,7 @@ async def myLoop():
                                        "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/chapter-",
                                        93, 0, 174)
         await channel.send(embed=embed)
-        await channel.send(f'Ping: {subscription}')
+        await channel.send(f'Ping of The Great Mage Returns After 4000 Years {number_chapter_mage_returns}: {subscription}')
     if last_chapters["Is this Hero for Real?"] < number_chapter_hero_for_real:
         last_chapters["Is this Hero for Real?"] = number_chapter_hero_for_real
         new_chapter = f"Is this Hero for Real? has a new chapter {number_chapter_archmage_streamer}!"
@@ -247,7 +247,7 @@ async def myLoop():
         embed = getReaperScansReleased("Is this Hero for Real?", "https://reaperscans.com/series/is-this-hero-for-real/",
                                "https://reaperscans.com/series/is-this-hero-for-real/chapter-", 0, 0, 0)
         await channel.send(embed=embed)
-        await channel.send(f'Ping: {subscription}')
+        await channel.send(f'Ping of Is this Hero for Real? {number_chapter_hero_for_real}: {subscription}',delete_after=3)
     if last_chapters["Archmage Streamer"] < number_chapter_archmage_streamer:
         last_chapters["Archmage Streamer"] = number_chapter_archmage_streamer
         new_chapter = f"Archmage Streamer has a new chapter {number_chapter_archmage_streamer}!"
@@ -256,7 +256,7 @@ async def myLoop():
         embed = getReaperScansReleased("Archmage Streamer", "https://reaperscans.com/series/archmage-streamer/",
                                "https://reaperscans.com/series/archmage-streamer/chapter-", 0, 180, 246)
         await channel.send(embed=embed)
-        await channel.send(f'Ping: {subscription}',delete_after=3)
+        await channel.send(f'Ping of Archmage Streamer {number_chapter_archmage_streamer}: {subscription}',delete_after=3)
 
 
     # Save the last_chapters to the chapters.txt file
@@ -402,12 +402,12 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
 
     if len(chapters_released)>1:
         embed = discord.Embed(title=f"{Title}", url=f"{urlbasic}",
-                          description=f"{message_release} \n Link to latest chapter: {urlchapter} + \n Ping: {subscription}",
+                          description=f"{message_release} \n Link to latest chapter: {urlchapter}",
                           color=discord.Color.from_rgb(r1, g, b))
         embed.set_image(url=f"{url_thumbnail}")
     else:
         embed = discord.Embed(title=f"{Title}", url=f"{urlbasic}",
-                          description=f"{message_release} \n Link to the chapter: {urlchapter} + \n Ping: {subscription}" ,
+                          description=f"{message_release} \n Link to the chapter: {urlchapter}" ,
                           color=discord.Color.from_rgb(r1, g, b))
         embed.set_image(url=f"{url_thumbnail}")
     return embed
