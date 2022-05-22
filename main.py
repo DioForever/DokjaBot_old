@@ -10,6 +10,24 @@ from discord.ext import commands
 
 bot = commands.Bot(command_prefix="!")
 
+last_chapters = {
+    "The Challenger": 0,
+    "The Great Mage Returns After 4000 Years": 0,
+    "Is this Hero for Real?": 0,
+    "Archmage Streamer": 0,
+    "tbate": 0,
+    "fff_trashero": 0,
+}
+content=[]
+# await bot.wait_until_ready()
+with open('chapters.txt','r') as f:
+    for line in f:
+        line_ = line.split('-')
+        last_chapters[line_[0]]=int(line_[1])
+
+
+
+
 
 @bot.command()
 async def supl(ctx):
@@ -154,24 +172,20 @@ async def m_the_challenger(ctx):
     await ctx.send(embed=embed)
 
 
-last_chapters = {
-    "The Challenger": 0,
-    "The Great Mage Returns After 4000 Years": 0,
-    "Is this Hero for Real?": 0,
-    "Archmage Streamer": 0,
-    "tbate": 0,
-    "fff_trashero": 0,
 
-}
 
 
 
 
 @tasks.loop(seconds=60)  # repeat after every 10 seconds
 async def myLoop():
+
     await bot.wait_until_ready()
     channel = bot.get_channel(977231331199164466)
-
+    content = []
+    with open('chapters.txt', 'r') as f:
+        for line in f:
+            content.append(line)
     number_chapter_challenger = getReaperScans("The Challenger",
                                                "https://reaperscans.com/series/the-challenger/https://reaperscans.com/series/the-challenger/",
                                                "https://reaperscans.com/series/the-challenger/chapter-", 246, 214, 4,
@@ -187,10 +201,13 @@ async def myLoop():
         getReaperScans("Archmage Streamer", "https://reaperscans.com/series/archmage-streamer/",
                        "https://reaperscans.com/series/archmage-streamer/chapter-", 0, 180, 246, 18, 0, 4)[1]
 
+    content_new = []
     if last_chapters["The Challenger"] < number_chapter_challenger:
         last_chapters["The Challenger"] = number_chapter_challenger
         new_chapter = f"The Challenger has a new chapter {number_chapter_challenger}!"
-        print(new_chapter)
+        changed = True
+        content_new.append(f"The Challenger-{number_chapter_challenger}")
+
         embed = getReaperScansReleased("The Challenger",
                                        "https://reaperscans.com/series/the-challenger/https://reaperscans.com/series/the-challenger/",
                                        "https://reaperscans.com/series/the-challenger/chapter-", 246, 214, 4)
@@ -198,7 +215,8 @@ async def myLoop():
     if last_chapters["The Great Mage Returns After 4000 Years"] < number_chapter_mage_returns:
         last_chapters["The Great Mage Returns After 4000 Years"] = number_chapter_mage_returns
         new_chapter = f"The Great Mage Returns After 4000 Years has a new chapter {number_chapter_mage_returns}!"
-        print(new_chapter)
+        changed = True
+        content_new.append(f"The Great Mage Returns After 4000 Years-{number_chapter_mage_returns}")
         embed = getReaperScansReleased("The Great Mage Returns After 4000 Years",
                                        "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/",
                                        "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/chapter-",
@@ -207,18 +225,41 @@ async def myLoop():
     if last_chapters["Is this Hero for Real?"] < number_chapter_hero_for_real:
         last_chapters["Is this Hero for Real?"] = number_chapter_hero_for_real
         new_chapter = f"Is this Hero for Real? has a new chapter {number_chapter_archmage_streamer}!"
-        print(new_chapter)
+        changed = True
+        content_new.append(f"Is this Hero for Real?-{number_chapter_hero_for_real}")
         embed = getReaperScansReleased("Is this Hero for Real?", "https://reaperscans.com/series/is-this-hero-for-real/",
                                "https://reaperscans.com/series/is-this-hero-for-real/chapter-", 0, 0, 0)
         await channel.send(embed=embed)
     if last_chapters["Archmage Streamer"] < number_chapter_archmage_streamer:
         last_chapters["Archmage Streamer"] = number_chapter_archmage_streamer
         new_chapter = f"Archmage Streamer has a new chapter {number_chapter_archmage_streamer}!"
-        print(new_chapter)
+        changed = True
+        content_new.append(f"Archmage Streamer-{number_chapter_archmage_streamer}")
         embed = getReaperScansReleased("Archmage Streamer", "https://reaperscans.com/series/archmage-streamer/",
                                "https://reaperscans.com/series/archmage-streamer/chapter-", 0, 180, 246)
         await channel.send(embed=embed)
 
+    # Save the last_chapters to the chapters.txt file
+    '''    for con in content:
+        for co in content_new:
+            con_ = con.split('-')[0]
+            co_ = co.split('-')[0]
+            if con_==co_:
+                content.remove(con)'''
+    with open('chapters.txt', 'w') as wf:
+        # Check if there are some that have to be updated
+        for c in content:
+            for c_ in content_new:
+                cs = c.split('-')[0]
+                cs_ = c_.split('-')[0]
+                if cs_ == cs:
+                    content.remove(c)
+
+        # Write it down
+        for c in content_new:
+            wf.write(c+" \n")
+        for c in content:
+            wf.write(c)
 
 def getTime(rHour, rMinute, rDay):
     date = datetime.today().strftime("%Y-%m-%d")
@@ -342,7 +383,7 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
         embed.set_image(url=f"{url_thumbnail}")
     else:
         embed = discord.Embed(title=f"{Title}", url=f"{urlbasic}",
-                          description=f"{message_release} \n Link to the chapter: {urlchapter}",
+                          description=f"{message_release} \n Link to the chapter: {urlchapter}" ,
                           color=discord.Color.from_rgb(r1, g, b))
         embed.set_image(url=f"{url_thumbnail}")
     return embed
