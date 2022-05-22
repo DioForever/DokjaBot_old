@@ -47,6 +47,18 @@ async def supl(ctx):
                 messageToSend = f"1.B {predmet} {ucitel} {skupina} {typ} {hodina}. hodina"
                 await ctx.send(messageToSend)
 
+@bot.command()
+async def m_subscribe_all(ctx):
+    subscription_all = []
+    with open('chapters_release_ping', 'r') as f:
+        for line in f:
+            subscription_all.append(line)
+    #Now check if user is in the list
+
+    await bot.wait_until_ready()
+    channel = bot.get_channel(977231331199164466)
+    await channel.send('Pinging {}'.format(ctx.author.mention))
+    await channel.send('<@401845652541145089>')
 
 @bot.command()
 async def m_list(ctx):
@@ -168,7 +180,7 @@ async def m_mage_returns(ctx):
 async def m_the_challenger(ctx):
     embed = getReaperScans("The Challenger",
                            "https://reaperscans.com/series/the-challenger/https://reaperscans.com/series/the-challenger/",
-                           "https://reaperscans.com/series/the-challenger/chapter-", 246, 214, 4, 18, 0, 3)[0]
+                           "https://reaperscans.com/series/the-challenger/chapter-", 246, 214, 4, 18, 0, 5)[0]
     await ctx.send(embed=embed)
 
 
@@ -200,7 +212,10 @@ async def myLoop():
     number_chapter_archmage_streamer = \
         getReaperScans("Archmage Streamer", "https://reaperscans.com/series/archmage-streamer/",
                        "https://reaperscans.com/series/archmage-streamer/chapter-", 0, 180, 246, 18, 0, 4)[1]
-
+    subscription = []
+    with open('chapters_release_ping', 'r') as f:
+        for line in f:
+            subscription.append(line)
     content_new = []
     if last_chapters["The Challenger"] < number_chapter_challenger:
         last_chapters["The Challenger"] = number_chapter_challenger
@@ -212,6 +227,7 @@ async def myLoop():
                                        "https://reaperscans.com/series/the-challenger/https://reaperscans.com/series/the-challenger/",
                                        "https://reaperscans.com/series/the-challenger/chapter-", 246, 214, 4)
         await channel.send(embed=embed)
+        await channel.send(f'Ping: {subscription}')
     if last_chapters["The Great Mage Returns After 4000 Years"] < number_chapter_mage_returns:
         last_chapters["The Great Mage Returns After 4000 Years"] = number_chapter_mage_returns
         new_chapter = f"The Great Mage Returns After 4000 Years has a new chapter {number_chapter_mage_returns}!"
@@ -222,6 +238,7 @@ async def myLoop():
                                        "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/chapter-",
                                        93, 0, 174)
         await channel.send(embed=embed)
+        await channel.send(f'Ping: {subscription}')
     if last_chapters["Is this Hero for Real?"] < number_chapter_hero_for_real:
         last_chapters["Is this Hero for Real?"] = number_chapter_hero_for_real
         new_chapter = f"Is this Hero for Real? has a new chapter {number_chapter_archmage_streamer}!"
@@ -230,6 +247,7 @@ async def myLoop():
         embed = getReaperScansReleased("Is this Hero for Real?", "https://reaperscans.com/series/is-this-hero-for-real/",
                                "https://reaperscans.com/series/is-this-hero-for-real/chapter-", 0, 0, 0)
         await channel.send(embed=embed)
+        await channel.send(f'Ping: {subscription}')
     if last_chapters["Archmage Streamer"] < number_chapter_archmage_streamer:
         last_chapters["Archmage Streamer"] = number_chapter_archmage_streamer
         new_chapter = f"Archmage Streamer has a new chapter {number_chapter_archmage_streamer}!"
@@ -238,6 +256,8 @@ async def myLoop():
         embed = getReaperScansReleased("Archmage Streamer", "https://reaperscans.com/series/archmage-streamer/",
                                "https://reaperscans.com/series/archmage-streamer/chapter-", 0, 180, 246)
         await channel.send(embed=embed)
+        await channel.send(f'Ping: {subscription}',delete_after=3)
+
 
     # Save the last_chapters to the chapters.txt file
     '''    for con in content:
@@ -348,6 +368,10 @@ def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
     return embed, chapter_number
 
 def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
+    subscription = []
+    with open('chapters_release_ping', 'r') as f:
+        for line in f:
+            subscription.append(line)
     web = r.get(url=urlbasic)
     chapter_number = 0
     soup = bs(web.content, features="html.parser")
@@ -378,17 +402,17 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
 
     if len(chapters_released)>1:
         embed = discord.Embed(title=f"{Title}", url=f"{urlbasic}",
-                          description=f"{message_release} \n Link to latest chapter: {urlchapter}",
+                          description=f"{message_release} \n Link to latest chapter: {urlchapter} + \n Ping: {subscription}",
                           color=discord.Color.from_rgb(r1, g, b))
         embed.set_image(url=f"{url_thumbnail}")
     else:
         embed = discord.Embed(title=f"{Title}", url=f"{urlbasic}",
-                          description=f"{message_release} \n Link to the chapter: {urlchapter}" ,
+                          description=f"{message_release} \n Link to the chapter: {urlchapter} + \n Ping: {subscription}" ,
                           color=discord.Color.from_rgb(r1, g, b))
         embed.set_image(url=f"{url_thumbnail}")
     return embed
 
-
+# <@401845652541145089>
 
 
 myLoop.start()
