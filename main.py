@@ -289,7 +289,11 @@ def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
     chapter_number = float(str(chapter_text[2]).split('<')[0])
     # Now I have the number as well
 
-    urlchapter = f"{urlchapter}-{chapter_number}/"
+    if chapter_number == round(chapter_number,0):
+        urlchapter = f"{urlchapter}{int(chapter_number)}/"
+    else:
+        moment_number = str(chapter_number).replace('.','-')
+        urlchapter = f"{urlchapter}{moment_number}/"
 
     # Now get the time of release and if it already was released today or not
     time_left = getTime(rHour, rMin, rDay)[0]
@@ -314,9 +318,9 @@ def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
     if getTime(rHour, rMin, rDay)[1] is True and released_today is True:
         message_release = f"The chapter is being translated or is on a break"
     else:
-        chapter_number += 1
-        message_release = f"The Chapter {chapter_number} will be released in {getTime(rHour, rMin, rDay)[0]}"
-        chapter_number -= 1
+        m_chapter_number = int(chapter_number)
+        m_chapter_number += 1
+        message_release = f"The Chapter {m_chapter_number} will be released in {getTime(rHour, rMin, rDay)[0]}"
     # Now display it
 
     embed = discord.Embed(title=f"{Title}", url=f"{urlbasic}",
@@ -345,7 +349,11 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
     chapter_number = float(str(chapter_text[2]).split('<')[0])
     # Now I have the number as well
 
-    urlchapter = f"{urlchapter}-{chapter_number}/"
+    if chapter_number == round(chapter_number,0):
+        urlchapter = f"{urlchapter}{int(chapter_number)}/"
+    else:
+        moment_number = str(chapter_number).replace('.','-')
+        urlchapter = f"{urlchapter}{moment_number}/"
 
     # Now get the time of release and if it already was released today or not
 
