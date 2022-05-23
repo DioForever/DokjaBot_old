@@ -10,13 +10,7 @@ from discord.ext import commands
 bot = commands.Bot(command_prefix="!")
 
 last_chapters = {
-    'Return of the Legendary Spear Knight': 0,
-    "The Challenger": 0,
-    "The Great Mage Returns After 4000 Years": 0,
-    "Is this Hero for Real?": 0,
-    "Archmage Streamer": 0,
-    "tbate": 0,
-    "fff_trashero": 0,
+
 }
 content = []
 # await bot.wait_until_ready()
@@ -34,7 +28,6 @@ with open('chapters_listed', 'r') as r:
         if line is not None:
             manhwas.append(line)
 
-print(manhwas)
 cmds = []
 count = 0
 for line in manhwas:
@@ -205,30 +198,39 @@ async def myLoop():
             if line[2] == 'Reaper_Scans':
                 number_current_chapter = \
                 getReaperScans(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]),int(line[8]), int(line[9]), int(line[10]))[1]
-                if last_chapters[f"{line[1]}"] < number_current_chapter:
-                    last_chapters[line[1]] = number_current_chapter
-                    content_new.append(f"{line[1]}-{number_current_chapter}")
+                if not last_chapters.__contains__(line[1]):
+                    last_chapter_number = number_current_chapter-1
+                    contains = False
+                else:
+                    last_chapter_number = last_chapters[line[1]]
+                    contains = True
+                if last_chapter_number < number_current_chapter:
+                    if contains is True:
+                        last_chapters[last_chapter_number] = number_current_chapter
+                        content_new.append(f"{line[1]}-{number_current_chapter}")
+                    else:
+                        content_new.append(f"{line[1]}-{number_current_chapter}")
                     embed = getReaperScansReleased(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]))
                     await channel.send(embed=embed)
                     await channel.send(f'Ping of The {line[1]} {number_current_chapter}: {subscription}',
                                        delete_after=3)
+                with open('chapters_latest.txt', 'w') as wf:
+                    # Check if there are some that have to be updated
+                    for c in content:
+                        for c_ in content_new:
+                            cs = c.split('-')[0]
+                            cs_ = c_.split('-')[0]
+                            if cs_ == cs:
+                                content.remove(c)
 
+                    # Write it down
+                    for c in content_new:
+                        wf.write(c + " \n")
+                    for c in content:
+                        wf.write(c)
 
     # Save the last_chapters to the chapters_latest.txt file
-    with open('chapters_latest.txt', 'w') as wf:
-        # Check if there are some that have to be updated
-        for c in content:
-            for c_ in content_new:
-                cs = c.split('-')[0]
-                cs_ = c_.split('-')[0]
-                if cs_ == cs:
-                    content.remove(c)
 
-        # Write it down
-        for c in content_new:
-            wf.write(c + " \n")
-        for c in content:
-            wf.write(c)
 
 
 def getTime(rHour, rMinute, rDay):
@@ -342,7 +344,11 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
     # Now get the time of release and if it already was released today or not
 
     chapters_released = ""
-    if last_chapters[Title] - chapter_number != -1:
+    if not last_chapters.__contains__(Title):
+        last_chapter_number = chapter_number-1
+    else:
+        last_chapter_number = last_chapters[Title]
+    if last_chapter_number - chapter_number != -1:
         # It has more than 1 released chapter at once, so it was mass release or somethin like that
         for number in range(last_chapters[Title], chapter_number + 1):
             chapters_released += str(number) + ", "
