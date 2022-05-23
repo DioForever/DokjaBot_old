@@ -18,10 +18,8 @@ with open('chapters_latest.txt', 'r') as f:
     for line in f:
         if line is not None:
             line_ = line.split('-')
-            last_chapters[line_[0]] = int(line_[1])
+            last_chapters[line_[0]] = float(line_[1])
         # Title Source  url  url_chapter r g b rHour rMinute rDay
-print(float(1))
-print(int(1))
 manhwas = []
 
 with open('chapters_listed', 'r') as r:
@@ -328,7 +326,7 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
         for line in f:
             subscription.append(line)
     web = req.get(url=urlbasic)
-    chapter_number = 0
+    chapter_number = float(0)
     soup = bs(web.content, features="html.parser")
     chapter = soup.find("li", class_="wp-manga-chapter")
     thumbnail_text = str(chapter.find("img", class_="thumb"))
@@ -352,7 +350,7 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
         last_chapter_number = last_chapters[Title]
     if last_chapter_number - chapter_number != -1:
         # It has more than 1 released chapter at once, so it was mass release or somethin like that
-        for number in range(last_chapters[Title], chapter_number + 1):
+        for number in range(int(last_chapters[Title]), int(chapter_number) + 1):
             chapters_released += str(number) + ", "
         message_release = f"The Chapters {chapters_released} was released!"
     else:
