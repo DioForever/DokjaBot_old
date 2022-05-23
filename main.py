@@ -42,28 +42,23 @@ count = 0
 for line in manhwas:
     line = line.split("  ")
     index = count
-    print(line[0])
     Titles.append(line[0])
 
 @bot.command()
 async def m_test(ctx, title):
-    print(title)
     title = str(title).lower()
     if Titles.__contains__(title):
-        print("yes")
         #Now look into chapters and find it
         for manhwa in manhwas:
             manhwa = manhwa.split("  ")
             if manhwa[0] == title:
                 # Now we found the manhwa we wanted
                 source = manhwa[2]
-                print(source)
                 if source == 'Reaper_Scans':
-                    print(source)
                     embed = getReaperScans(manhwa[1],manhwa[3],manhwa[4],int(manhwa[5]),int(manhwa[6]),int(manhwa[7]),int(manhwa[8]),int(manhwa[9]),int(manhwa[10]))[0]
                     await ctx.send(embed=embed)
                 else:
-                    await ctx.send('We dont support this source')
+                    await ctx.send("We don't support this source")
 @bot.command()
 async def supl(ctx):
     datet = datetime.today().strftime("%Y%m%d")
