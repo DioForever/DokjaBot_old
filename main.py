@@ -30,8 +30,11 @@ spear_bear = "spear_bear  Return of the Legendary Spear Bear  Reaper_Scans  http
              "  https://reaperscans.com/series/return-of-the-legendary-spear-knight/chapter-  0  34  255  18  0  6"
 archmage_streamer = "archmage_streamer  Archmage Streamer  Reaper_Scans  https://reaperscans.com/series/archmage-streamer/" \
                     "  https://reaperscans.com/series/archmage-streamer/chapter-  0  180  246  18  0  4"
-hero_for_real = "hero_for_real  Is this Hero for Real?  "
-manhwas = [spear_knight, spear_bear, archmage_streamer]
+hero_for_real = "hero_for_real  Is this Hero for Real?  Reaper_Scans  https://reaperscans.com/series/is-this-hero-for-real/" \
+                "  https://reaperscans.com/series/is-this-hero-for-real/chapter-  0  0  0  18  0  0"
+m_mage_returns = "mage_returns  The Great Mage Returns After 4000 Years  Reaper_Scans  https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/" \
+                 "  https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/chapter-  93  0  174  18  0  3"
+manhwas = [spear_knight, spear_bear, archmage_streamer,hero_for_real, m_mage_returns]
 Titles = []
 count = 0
 for line in manhwas:
@@ -184,28 +187,6 @@ async def m_fth(ctx):
     embed.set_image(url="https://i0.hdslb.com/bfs/comic-static/70c263ce2dffe3fdd94369955d0c2bc6cde0c70b.png@600w.jpg")
     await ctx.send(embed=embed)
 
-
-@bot.command()
-async def m_archmage_streamer(ctx):
-    embed = getReaperScans("Archmage Streamer", "https://reaperscans.com/series/archmage-streamer/",
-                           "https://reaperscans.com/series/archmage-streamer/chapter-", 0, 180, 246, 18, 0, 4)[0]
-    await ctx.send(embed=embed)
-
-
-@bot.command()
-async def m_hero_for_real(ctx):
-    embed = getReaperScans("Is this Hero for Real?", "https://reaperscans.com/series/is-this-hero-for-real/",
-                           "https://reaperscans.com/series/is-this-hero-for-real/chapter-", 0, 0, 0, 18, 0, 0)[0]
-    await ctx.send(embed=embed)
-
-
-@bot.command()
-async def m_mage_returns(ctx):
-    embed = getReaperScans("The Great Mage Returns After 4000 Years",
-                           "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/",
-                           "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/chapter-", 93,
-                           0, 174, 18, 0, 3)[0]
-    await ctx.send(embed=embed)
 
 
 @bot.command()
