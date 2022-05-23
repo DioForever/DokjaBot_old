@@ -6,9 +6,15 @@ import pandas as pd
 import requests as r
 from bs4 import BeautifulSoup as bs
 from discord.ext import commands
+from pypresence import Presence
 
 
 bot = commands.Bot(command_prefix="!")
+print('The DokjaBot has been activated')
+
+rpc = Presence(887378737149145128)
+rpc.connect()
+rpc.update(state="Reading",details='I am having fun',large_image='rpcphoto.png')
 
 last_chapters = {
     "The Challenger": 0,
