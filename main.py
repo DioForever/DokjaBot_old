@@ -34,7 +34,9 @@ hero_for_real = "hero_for_real  Is this Hero for Real?  Reaper_Scans  https://re
                 "  https://reaperscans.com/series/is-this-hero-for-real/chapter-  0  0  0  18  0  0"
 m_mage_returns = "mage_returns  The Great Mage Returns After 4000 Years  Reaper_Scans  https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/" \
                  "  https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/chapter-  93  0  174  18  0  3"
-manhwas = [spear_knight, spear_bear, archmage_streamer,hero_for_real, m_mage_returns]
+the_challenger = "challenger  The Challenger  Reaper_Scans  https://reaperscans.com/series/the-challenger/" \
+                 "  https://reaperscans.com/series/the-challenger/chapter-  246  214  4  18  0  5"
+manhwas = [spear_knight, spear_bear, archmage_streamer,hero_for_real, m_mage_returns, the_challenger]
 Titles = []
 count = 0
 for line in manhwas:
