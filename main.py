@@ -15,7 +15,6 @@ last_chapters = {
 content = []
 # await bot.wait_until_ready()
 print("DokjaBot activated")
-
 with open('chapters_latest.txt', 'r') as f:
     for line in f:
         if line is not None:
@@ -202,16 +201,19 @@ async def myLoop():
                     float(getReaperScans(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]),
                                          int(line[8]), int(line[9]), int(line[10]))[1])
                 if not last_chapters.keys().__contains__(line[1]):
+                    print(last_chapters.keys(), line[1],'Not')
+                    print(line[1]  + line[1],'Not')
                     last_chapter_number = number_current_chapter - 1
                     contains = False
                 else:
                     last_chapter_number = last_chapters[line[1]]
+                    print(last_chapter_number, line[1],'Yes')
                     contains = True
                 if last_chapter_number < number_current_chapter:
-                    print(last_chapter_number)
-                    print(number_current_chapter)
+                    print(last_chapter_number, line[1],'new')
+                    print(number_current_chapter, line[1],'new')
                     if contains is True:
-                        last_chapters[last_chapter_number] = number_current_chapter
+                        last_chapters[line[1]] = number_current_chapter
                         content_new.append(f"{line[1]}-{number_current_chapter}")
                     else:
                         content_new.append(f"{line[1]}-{number_current_chapter}")
