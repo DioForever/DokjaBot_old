@@ -3,13 +3,14 @@ from datetime import datetime
 from discord.ext import tasks
 import discord
 import pandas as pd
-import requests as r
+import requests as req
 from bs4 import BeautifulSoup as bs
 from discord.ext import commands
 
 bot = commands.Bot(command_prefix="!")
 
 last_chapters = {
+    'Return of the Legendary Spear Knight': 0,
     "The Challenger": 0,
     "The Great Mage Returns After 4000 Years": 0,
     "Is this Hero for Real?": 0,
@@ -19,50 +20,62 @@ last_chapters = {
 }
 content = []
 # await bot.wait_until_ready()
-with open('chapters.txt', 'r') as f:
+with open('chapters_latest.txt', 'r') as f:
     for line in f:
-        line_ = line.split('-')
-        last_chapters[line_[0]] = int(line_[1])
+        if line is not None:
+            line_ = line.split('-')
+            last_chapters[line_[0]] = int(line_[1])
         # Title Source  url  url_chapter r g b rHour rMinute rDay
-spear_knight = "spear_knight  Return of the Legendary Spear Knight  Reaper_Scans  https://reaperscans.com/series/return-of-the-legendary-spear-knight/" \
-               "  https://reaperscans.com/series/return-of-the-legendary-spear-knight/chapter-  0  34  255  18  0  6"
-spear_bear = "spear_bear  Return of the Legendary Spear Bear  Reaper_Scans  https://reaperscans.com/series/return-of-the-legendary-spear-knight/" \
-             "  https://reaperscans.com/series/return-of-the-legendary-spear-knight/chapter-  0  34  255  18  0  6"
-archmage_streamer = "archmage_streamer  Archmage Streamer  Reaper_Scans  https://reaperscans.com/series/archmage-streamer/" \
-                    "  https://reaperscans.com/series/archmage-streamer/chapter-  0  180  246  18  0  4"
-hero_for_real = "hero_for_real  Is this Hero for Real?  Reaper_Scans  https://reaperscans.com/series/is-this-hero-for-real/" \
-                "  https://reaperscans.com/series/is-this-hero-for-real/chapter-  0  0  0  18  0  0"
-m_mage_returns = "mage_returns  The Great Mage Returns After 4000 Years  Reaper_Scans  https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/" \
-                 "  https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/chapter-  93  0  174  18  0  3"
-the_challenger = "challenger  The Challenger  Reaper_Scans  https://reaperscans.com/series/the-challenger/" \
-                 "  https://reaperscans.com/series/the-challenger/chapter-  246  214  4  18  0  5"
-manhwas = [spear_knight, spear_bear, archmage_streamer,hero_for_real, m_mage_returns, the_challenger]
-Titles = []
+
+manhwas = []
+
+with open('chapters_listed', 'r') as r:
+    for line in r:
+        if line is not None:
+            manhwas.append(line)
+
+print(manhwas)
+cmds = []
 count = 0
 for line in manhwas:
     line = line.split("  ")
     index = count
-    Titles.append(line[0])
+    cmds.append(line[0])
+
 
 @bot.command()
-async def m_test(ctx, title):
-    title = str(title).lower()
-    if Titles.__contains__(title):
-        #Now look into chapters and find it
+async def m(ctx, arg):
+    global release_list
+    title = str(arg).lower()
+    if cmds.__contains__(arg):
+        # Now look into chapters and find it
         for manhwa in manhwas:
             manhwa = manhwa.split("  ")
-            if manhwa[0] == title:
+            if manhwa[0] == arg:
                 # Now we found the manhwa we wanted
                 source = manhwa[2]
                 if source == 'Reaper_Scans':
-                    embed = getReaperScans(manhwa[1],manhwa[3],manhwa[4],int(manhwa[5]),int(manhwa[6]),int(manhwa[7]),int(manhwa[8]),int(manhwa[9]),int(manhwa[10]))[0]
+                    embed = \
+                    getReaperScans(manhwa[1], manhwa[3], manhwa[4], int(manhwa[5]), int(manhwa[6]), int(manhwa[7]),
+                                   int(manhwa[8]), int(manhwa[9]), int(manhwa[10]))[0]
                     await ctx.send(embed=embed)
                 else:
                     await ctx.send("We don't support this source")
+    elif arg == "list":
+        release_list = "\n"
+        for line in manhwas:
+            line = line.split("  ")
+            release_list += f"{line[1]}: !m {line[0]}\n"
+        embed = discord.Embed(title=f"List of Manhwas/Mangas",
+                              description=f"The list of commands for \n " + "Manhwas and Mangas in system" + f"\n {release_list}",
+                              color=discord.Color.from_rgb(246, 214, 4))
+        await ctx.send(embed=embed)
+
+
 @bot.command()
 async def supl(ctx):
     datet = datetime.today().strftime("%Y%m%d")
-    odpoved = r.get("https://skripta.ssps.cz/substitutions.php/?date=" + datet)
+    odpoved = req.get("https://skripta.ssps.cz/substitutions.php/?date=" + datet)
     print("https://skripta.ssps.cz/substitutions.php/?date=" + datet)
     data = json.loads(odpoved.content)
 
@@ -93,22 +106,8 @@ async def m_subscribe_all(ctx):
 
 
 @bot.command()
-async def m_list(ctx):
-    all = ("\n  The Beginning after the end - !m_tbate \n" +
-           "    The Challenger - !m_the_challenger \n" +
-           "    Is this Hero for Real? - !m_hero_for_real \n" +
-           "    Archmage Streamer - !m_archmage_streamer \n" +
-           "    FFF-Class Trashero - !m_fth \n" +
-           "    The Great Mage Returns After 4000 Years - !m_mage_returns \n")
-    embed = discord.Embed(title=f"List of Manhwas/Mangas",
-                          description=f"The list of commands for \n " + "Manhwas and Mangas in system" + f"\n {all}",
-                          color=discord.Color.from_rgb(246, 214, 4))
-    await ctx.send(embed=embed)
-
-
-@bot.command()
 async def m_tbate(ctx):
-    TBATE_Web = r.get("https://beginningafterend.com/?2022-05%3F2022-05-20")
+    TBATE_Web = req.get("https://beginningafterend.com/?2022-05%3F2022-05-20")
     soupTBATE = bs(TBATE_Web.content, features="html.parser")
     date = datetime.today().strftime("%Y-%m-%d")
 
@@ -123,7 +122,7 @@ async def m_tbate(ctx):
                     chapter_number = item
 
     url_chapter = "https://beginningafterend.com/manga/the-beginning-after-the-end-chapter-" + chapter_number + "/?" + date
-    web_Chapter = r.get(url_chapter)
+    web_Chapter = req.get(url_chapter)
     soup_Chapter = bs(web_Chapter.content, features="html.parser")
     headers2 = soup_Chapter.find("div", class_="tickcounter")
     today_bool = False
@@ -153,7 +152,7 @@ async def m_tbate(ctx):
 
 @bot.command()
 async def m_fth(ctx):
-    FFF_Web = r.get("https://manhuazone.com/manga/5-fff-class-tras-hero/")
+    FFF_Web = req.get("https://manhuazone.com/manga/5-fff-class-tras-hero/")
     soupFFF = bs(FFF_Web.content, features="html.parser")
     chapterFFF = soupFFF.find("li", class_="wp-manga-chapter")
     a_text = chapterFFF.find("a")
@@ -169,7 +168,7 @@ async def m_fth(ctx):
             chapter_number = a
 
     url_chapter = f"https://ww2.fff-classtrashero.com/manga/fff-class-trashero-chapter-{chapter_number}/"
-    web_Chapter = r.get(url_chapter)
+    web_Chapter = req.get(url_chapter)
     soup_Chapter = bs(web_Chapter.content, features="html.parser")
     date_split = url_chapter.split('?')
     date_length = len(date_split)
@@ -184,97 +183,39 @@ async def m_fth(ctx):
     embed.set_image(url="https://i0.hdslb.com/bfs/comic-static/70c263ce2dffe3fdd94369955d0c2bc6cde0c70b.png@600w.jpg")
     await ctx.send(embed=embed)
 
-
-
-@bot.command()
-async def m_the_challenger(ctx):
-    embed = getReaperScans("The Challenger",
-                           "https://reaperscans.com/series/the-challenger/https://reaperscans.com/series/the-challenger/",
-                           "https://reaperscans.com/series/the-challenger/chapter-", 246, 214, 4, 18, 0, 5)[0]
-    await ctx.send(embed=embed)
-
-
 @tasks.loop(seconds=60)  # repeat after every 10 seconds
 async def myLoop():
     await bot.wait_until_ready()
     channel = bot.get_channel(977231331199164466)
     content = []
-    with open('chapters.txt', 'r') as f:
+    subscription = []
+    with open('chapters_latest.txt', 'r') as f:
         for line in f:
             content.append(line)
-    number_chapter_challenger = getReaperScans("The Challenger",
-                                               "https://reaperscans.com/series/the-challenger/https://reaperscans.com/series/the-challenger/",
-                                               "https://reaperscans.com/series/the-challenger/chapter-", 246, 214, 4,
-                                               18, 0, 3)[1]
-    number_chapter_mage_returns = getReaperScans("The Great Mage Returns After 4000 Years",
-                                                 "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/",
-                                                 "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/chapter-",
-                                                 93, 0, 174, 18, 0, 3)[1]
-    number_chapter_hero_for_real = \
-        getReaperScans("Is this Hero for Real?", "https://reaperscans.com/series/is-this-hero-for-real/",
-                       "https://reaperscans.com/series/is-this-hero-for-real/chapter-", 0, 0, 0, 18, 0, 0)[1]
-    number_chapter_archmage_streamer = \
-        getReaperScans("Archmage Streamer", "https://reaperscans.com/series/archmage-streamer/",
-                       "https://reaperscans.com/series/archmage-streamer/chapter-", 0, 180, 246, 18, 0, 4)[1]
-    subscription = []
+
     with open('chapters_release_ping', 'r') as f:
         for line in f:
             subscription.append(line)
     content_new = []
-    if last_chapters["The Challenger"] < number_chapter_challenger:
-        last_chapters["The Challenger"] = number_chapter_challenger
-        new_chapter = f"The Challenger has a new chapter {number_chapter_challenger}!"
-        changed = True
-        content_new.append(f"The Challenger-{number_chapter_challenger}")
 
-        embed = getReaperScansReleased("The Challenger",
-                                       "https://reaperscans.com/series/the-challenger/https://reaperscans.com/series/the-challenger/",
-                                       "https://reaperscans.com/series/the-challenger/chapter-", 246, 214, 4)
-        await channel.send(embed=embed)
-        await channel.send(f'Ping of The Challenger {number_chapter_challenger}: {subscription}', delete_after=3)
-    if last_chapters["The Great Mage Returns After 4000 Years"] < number_chapter_mage_returns:
-        last_chapters["The Great Mage Returns After 4000 Years"] = number_chapter_mage_returns
-        new_chapter = f"The Great Mage Returns After 4000 Years has a new chapter {number_chapter_mage_returns}!"
-        changed = True
-        content_new.append(f"The Great Mage Returns After 4000 Years-{number_chapter_mage_returns}")
-        embed = getReaperScansReleased("The Great Mage Returns After 4000 Years",
-                                       "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/",
-                                       "https://reaperscans.com/series/the-great-mage-that-returned-after-4000-years/chapter-",
-                                       93, 0, 174)
-        await channel.send(embed=embed)
-        await channel.send(
-            f'Ping of The Great Mage Returns After 4000 Years {number_chapter_mage_returns}: {subscription}',
-            delete_after=3)
-    if last_chapters["Is this Hero for Real?"] < number_chapter_hero_for_real:
-        last_chapters["Is this Hero for Real?"] = number_chapter_hero_for_real
-        new_chapter = f"Is this Hero for Real? has a new chapter {number_chapter_archmage_streamer}!"
-        changed = True
-        content_new.append(f"Is this Hero for Real?-{number_chapter_hero_for_real}")
-        embed = getReaperScansReleased("Is this Hero for Real?",
-                                       "https://reaperscans.com/series/is-this-hero-for-real/",
-                                       "https://reaperscans.com/series/is-this-hero-for-real/chapter-", 0, 0, 0)
-        await channel.send(embed=embed)
-        await channel.send(f'Ping of Is this Hero for Real? {number_chapter_hero_for_real}: {subscription}',
-                           delete_after=3)
-    if last_chapters["Archmage Streamer"] < number_chapter_archmage_streamer:
-        last_chapters["Archmage Streamer"] = number_chapter_archmage_streamer
-        new_chapter = f"Archmage Streamer has a new chapter {number_chapter_archmage_streamer}!"
-        changed = True
-        content_new.append(f"Archmage Streamer-{number_chapter_archmage_streamer}")
-        embed = getReaperScansReleased("Archmage Streamer", "https://reaperscans.com/series/archmage-streamer/",
-                                       "https://reaperscans.com/series/archmage-streamer/chapter-", 0, 180, 246)
-        await channel.send(embed=embed)
-        await channel.send(f'Ping of Archmage Streamer {number_chapter_archmage_streamer}: {subscription}',
-                           delete_after=3)
+    with open('chapters_listed', 'r') as r:
+        for line in r:
+            # Get the released chapter as Name-number_chapter
+            line = line.split("  ")
+            if line[2] == 'Reaper_Scans':
+                number_current_chapter = \
+                getReaperScans(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]),int(line[8]), int(line[9]), int(line[10]))[1]
+                if last_chapters[f"{line[1]}"] < number_current_chapter:
+                    last_chapters[line[1]] = number_current_chapter
+                    content_new.append(f"{line[1]}-{number_current_chapter}")
+                    embed = getReaperScansReleased(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]))
+                    await channel.send(embed=embed)
+                    await channel.send(f'Ping of The {line[1]} {number_current_chapter}: {subscription}',
+                                       delete_after=3)
 
-    # Save the last_chapters to the chapters.txt file
-    '''    for con in content:
-        for co in content_new:
-            con_ = con.split('-')[0]
-            co_ = co.split('-')[0]
-            if con_==co_:
-                content.remove(con)'''
-    with open('chapters.txt', 'w') as wf:
+
+    # Save the last_chapters to the chapters_latest.txt file
+    with open('chapters_latest.txt', 'w') as wf:
         # Check if there are some that have to be updated
         for c in content:
             for c_ in content_new:
@@ -326,7 +267,7 @@ def getTime(rHour, rMinute, rDay):
 
 
 def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
-    web = r.get(url=urlbasic)
+    web = req.get(url=urlbasic)
     chapter_number = 0
     soup = bs(web.content, features="html.parser")
     chapter = soup.find("li", class_="wp-manga-chapter")
@@ -340,7 +281,7 @@ def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
     chapter_number = int(str(chapter_text[2]).split('<')[0])
     # Now I have the number as well
 
-    urlchapter = f"https://reaperscans.com/series/archmage-streamer/chapter-{chapter_number}/"
+    urlchapter = f"{urlchapter}-{chapter_number}/"
 
     # Now get the time of release and if it already was released today or not
     time_left = getTime(rHour, rMin, rDay)[0]
@@ -382,7 +323,7 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
     with open('chapters_release_ping', 'r') as f:
         for line in f:
             subscription.append(line)
-    web = r.get(url=urlbasic)
+    web = req.get(url=urlbasic)
     chapter_number = 0
     soup = bs(web.content, features="html.parser")
     chapter = soup.find("li", class_="wp-manga-chapter")
@@ -396,7 +337,7 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
     chapter_number = int(str(chapter_text[2]).split('<')[0])
     # Now I have the number as well
 
-    urlchapter = f"https://reaperscans.com/series/archmage-streamer/chapter-{chapter_number}/"
+    urlchapter = f"{urlchapter}-{chapter_number}/"
 
     # Now get the time of release and if it already was released today or not
 
