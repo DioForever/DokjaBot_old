@@ -15,19 +15,13 @@ last_chapters = {
 content = []
 # await bot.wait_until_ready()
 print("DokjaBot activated")
-with open('chapters_latest.txt', 'r') as f:
-    for line in f:
-        if line is not None:
-            line_ = line.split('-')
-            last_chapters[line_[0]] = float(line_[1])
-        # Title Source  url  url_chapter r g b rHour rMinute rDay
 manhwas = []
 
 with open('chapters_listed', 'r') as r:
     for line in r:
         if line is not None:
             manhwas.append(line)
-
+print(manhwas)
 cmds = []
 count = 0
 for line in manhwas:
@@ -91,7 +85,6 @@ async def m_subscribe_all(ctx):
         for line in f:
             subscription_all.append(line)
     # Now check if user is in the list
-
     await bot.wait_until_ready()
     channel = bot.get_channel(977231331199164466)
     await channel.send('Pinging {}'.format(ctx.author.mention))
@@ -177,10 +170,20 @@ async def m_fth(ctx):
     await ctx.send(embed=embed)
 
 
-@tasks.loop(seconds=60)  # repeat after every 10 seconds
+@tasks.loop(seconds=20)  # repeat after every 10 seconds
 async def myLoop():
     await bot.wait_until_ready()
     channel = bot.get_channel(977231331199164466)
+
+    with open('chapters_latest.txt', 'r') as f:
+        for line in f:
+            if line is not None:
+                line_ = line.split('-')
+                print([line_[0]])
+                print([line_[1]])
+                last_chapters.setdefault(line_[0], line_[1])
+            # Title Source  url  url_chapter r g b rHour rMinute rDay
+
     content = []
     subscription = []
     with open('chapters_latest.txt', 'r') as f:
@@ -194,19 +197,34 @@ async def myLoop():
 
     with open('chapters_listed', 'r') as r:
         for line in r:
+            print(line)
             # Get the released chapter as Name-number_chapter
             line = line.split("  ")
             if line[2] == 'Reaper_Scans':
+                print(line[1])
+                print(line[2])
+                print(line[3])
+                print(line[4])
+                print(line[5])
+                print(line[6])
+                print(line[7])
+                print(line[8])
+                print(line[9])
+                print(line[10])
                 number_current_chapter = \
                     float(getReaperScans(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]),
                                          int(line[8]), int(line[9]), int(line[10]))[1])
+                print(last_chapters.keys())
+                print(line[1])
                 if not last_chapters.keys().__contains__(line[1]):
                     last_chapter_number = number_current_chapter - 1
                     contains = False
                 else:
                     last_chapter_number = last_chapters[line[1]]
+                    print(last_chapter_number)
                     contains = True
-                if last_chapter_number < number_current_chapter:
+                last_chapter_number = float(last_chapter_number)
+                if (last_chapter_number) < number_current_chapter:
                     if contains is True:
                         last_chapters[line[1]] = number_current_chapter
                         content_new.append(f"{line[1]}-{number_current_chapter}")
@@ -216,6 +234,7 @@ async def myLoop():
                     await channel.send(embed=embed)
                     await channel.send(f'Ping of The {line[1]} {number_current_chapter}: {subscription}',
                                        delete_after=3)
+                print(line[1]+str(last_chapter_number)+str(number_current_chapter))
                 with open('chapters_latest.txt', 'w') as wf:
                     # Check if there are some that have to be updated
                     for c in content:
@@ -223,7 +242,7 @@ async def myLoop():
                             cs = c.split('-')[0]
                             cs_ = c_.split('-')[0]
                             if cs_ == cs:
-                                content.remove(c)
+                                   content.remove(c)
 
                     # Write it down
                     for c in content_new:
@@ -282,6 +301,7 @@ def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
     # Now I need the chapter number
     chapter_text = str(chapter.find("p", class_="chapter-manhwa-title")).split()
     chapter_number = float(str(chapter_text[2]).split('<')[0])
+
     # Now I have the number as well
 
     if chapter_number == round(chapter_number,0):
@@ -300,7 +320,13 @@ def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
     date_second_chapter = date_second_chapter[2]
     digit = (date_second_chapter.split())
     digit = (digit[1])
-    digit = digit.replace(",", "")
+    if digit.isalpha():
+        print(digit)
+        d = datetime.date(datetime.today())
+        d = d.strftime('%d')
+        digit= int(d)
+    else:
+        digit = digit.replace(",",'')
     digit = int(digit)
     digit += 7
     word = (date_second_chapter.split())[1]
@@ -326,6 +352,8 @@ def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
 
 
 def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
+
+
     subscription = []
     with open('chapters_release_ping', 'r') as f:
         for line in f:
@@ -344,13 +372,22 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
     chapter_number = float(str(chapter_text[2]).split('<')[0])
     # Now I have the number as well
 
-    if chapter_number == round(chapter_number,0):
+    '''    if chapter_number == round(chapter_number,0):
         urlchapter = f"{urlchapter}{int(chapter_number)}/"
     else:
         moment_number = str(chapter_number).replace('.','-')
-        urlchapter = f"{urlchapter}{moment_number}/"
+        urlchapter = f"{urlchapter}{moment_number}/"'''
 
     # Now get the time of release and if it already was released today or not
+    with open('chapters_latest.txt', 'r') as f:
+        for line in f:
+            if line is not None:
+                line_ = line.split('-')
+                print([line_[0]])
+                print([line_[1]])
+                last_chapters.setdefault(line_[0], line_[1])
+            # Title Source  url  url_chapter r g b rHour rMinute rDay
+
 
     chapters_released = ""
     if not last_chapters.__contains__(Title):
