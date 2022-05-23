@@ -20,7 +20,8 @@ with open('chapters_latest.txt', 'r') as f:
             line_ = line.split('-')
             last_chapters[line_[0]] = int(line_[1])
         # Title Source  url  url_chapter r g b rHour rMinute rDay
-
+print(float(1))
+print(int(1))
 manhwas = []
 
 with open('chapters_listed', 'r') as r:
@@ -49,8 +50,8 @@ async def m(ctx, arg):
                 source = manhwa[2]
                 if source == 'Reaper_Scans':
                     embed = \
-                    getReaperScans(manhwa[1], manhwa[3], manhwa[4], int(manhwa[5]), int(manhwa[6]), int(manhwa[7]),
-                                   int(manhwa[8]), int(manhwa[9]), int(manhwa[10]))[0]
+                        getReaperScans(manhwa[1], manhwa[3], manhwa[4], int(manhwa[5]), int(manhwa[6]), int(manhwa[7]),
+                                       int(manhwa[8]), int(manhwa[9]), int(manhwa[10]))[0]
                     await ctx.send(embed=embed)
                 else:
                     await ctx.send("We don't support this source")
@@ -176,6 +177,7 @@ async def m_fth(ctx):
     embed.set_image(url="https://i0.hdslb.com/bfs/comic-static/70c263ce2dffe3fdd94369955d0c2bc6cde0c70b.png@600w.jpg")
     await ctx.send(embed=embed)
 
+
 @tasks.loop(seconds=60)  # repeat after every 10 seconds
 async def myLoop():
     await bot.wait_until_ready()
@@ -197,9 +199,10 @@ async def myLoop():
             line = line.split("  ")
             if line[2] == 'Reaper_Scans':
                 number_current_chapter = \
-                getReaperScans(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]),int(line[8]), int(line[9]), int(line[10]))[1]
+                    float(getReaperScans(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]),
+                                         int(line[8]), int(line[9]), int(line[10]))[1])
                 if not last_chapters.__contains__(line[1]):
-                    last_chapter_number = number_current_chapter-1
+                    last_chapter_number = number_current_chapter - 1
                     contains = False
                 else:
                     last_chapter_number = last_chapters[line[1]]
@@ -230,7 +233,6 @@ async def myLoop():
                         wf.write(c)
 
     # Save the last_chapters to the chapters_latest.txt file
-
 
 
 def getTime(rHour, rMinute, rDay):
@@ -280,7 +282,7 @@ def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
 
     # Now I need the chapter number
     chapter_text = str(chapter.find("p", class_="chapter-manhwa-title")).split()
-    chapter_number = int(str(chapter_text[2]).split('<')[0])
+    chapter_number = float(str(chapter_text[2]).split('<')[0])
     # Now I have the number as well
 
     urlchapter = f"{urlchapter}-{chapter_number}/"
@@ -336,7 +338,7 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
 
     # Now I need the chapter number
     chapter_text = str(chapter.find("p", class_="chapter-manhwa-title")).split()
-    chapter_number = int(str(chapter_text[2]).split('<')[0])
+    chapter_number = float(str(chapter_text[2]).split('<')[0])
     # Now I have the number as well
 
     urlchapter = f"{urlchapter}-{chapter_number}/"
@@ -345,7 +347,7 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
 
     chapters_released = ""
     if not last_chapters.__contains__(Title):
-        last_chapter_number = chapter_number-1
+        last_chapter_number = chapter_number - 1
     else:
         last_chapter_number = last_chapters[Title]
     if last_chapter_number - chapter_number != -1:
