@@ -30,6 +30,7 @@ for line in manhwas:
     cmds.append(line[0])
 
 
+
 @bot.command()
 async def m(ctx, arg):
     global release_list
@@ -57,6 +58,8 @@ async def m(ctx, arg):
                               description=f"The list of commands for \n " + "Manhwas and Mangas in system" + f"\n {release_list}",
                               color=discord.Color.from_rgb(246, 214, 4))
         await ctx.send(embed=embed)
+    elif arg == "test":
+        await ctx.send(getMangaClash("The Beginning After The End","https://mangaclash.com/manga/the-beginning-after-the-end/","https://mangaclash.com/manga/the-beginning-after-the-end/chapter-", 0,0,0,0,0,0))
 
 
 @bot.command()
@@ -170,7 +173,7 @@ async def m_fth(ctx):
     await ctx.send(embed=embed)
 
 
-@tasks.loop(seconds=20)  # repeat after every 10 seconds
+@tasks.loop(seconds=60)  # repeat after every 10 seconds
 async def myLoop():
     await bot.wait_until_ready()
     channel = bot.get_channel(977231331199164466)
@@ -179,8 +182,6 @@ async def myLoop():
         for line in f:
             if line is not None:
                 line_ = line.split('-')
-                print([line_[0]])
-                print([line_[1]])
                 last_chapters.setdefault(line_[0], line_[1])
             # Title Source  url  url_chapter r g b rHour rMinute rDay
 
@@ -197,31 +198,17 @@ async def myLoop():
 
     with open('chapters_listed', 'r') as r:
         for line in r:
-            print(line)
             # Get the released chapter as Name-number_chapter
             line = line.split("  ")
             if line[2] == 'Reaper_Scans':
-                print(line[1])
-                print(line[2])
-                print(line[3])
-                print(line[4])
-                print(line[5])
-                print(line[6])
-                print(line[7])
-                print(line[8])
-                print(line[9])
-                print(line[10])
                 number_current_chapter = \
                     float(getReaperScans(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]),
                                          int(line[8]), int(line[9]), int(line[10]))[1])
-                print(last_chapters.keys())
-                print(line[1])
                 if not last_chapters.keys().__contains__(line[1]):
                     last_chapter_number = number_current_chapter - 1
                     contains = False
                 else:
                     last_chapter_number = last_chapters[line[1]]
-                    print(last_chapter_number)
                     contains = True
                 last_chapter_number = float(last_chapter_number)
                 if (last_chapter_number) < number_current_chapter:
@@ -234,7 +221,6 @@ async def myLoop():
                     await channel.send(embed=embed)
                     await channel.send(f'Ping of The {line[1]} {number_current_chapter}: {subscription}',
                                        delete_after=3)
-                print(line[1]+str(last_chapter_number)+str(number_current_chapter))
                 with open('chapters_latest.txt', 'w') as wf:
                     # Check if there are some that have to be updated
                     for c in content:
@@ -372,11 +358,11 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
     chapter_number = float(str(chapter_text[2]).split('<')[0])
     # Now I have the number as well
 
-    '''    if chapter_number == round(chapter_number,0):
+    if chapter_number == round(chapter_number,0):
         urlchapter = f"{urlchapter}{int(chapter_number)}/"
     else:
         moment_number = str(chapter_number).replace('.','-')
-        urlchapter = f"{urlchapter}{moment_number}/"'''
+        urlchapter = f"{urlchapter}{moment_number}/"
 
     # Now get the time of release and if it already was released today or not
     with open('chapters_latest.txt', 'r') as f:
@@ -415,6 +401,31 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
         embed.set_image(url=f"{url_thumbnail}")
     return embed
 
+
+# Manga Clash
+
+def getMangaClash(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
+    web = req.get(url=f"{urlbasic}")
+    menu_soup = bs(web.content, features="html.parser")
+    chapter_text = (menu_soup.find("li", class_="wp-manga-chapter"))
+    chapter_text = str(chapter_text.find("a"))
+    chapter_text = chapter_text.split(">")[1]
+    chapter_number = chapter_text.replace("</a","").split(" ")[1]
+    # now we have chapter_number
+
+    # now I need the chapter_thumbnail
+    thumbnail_text = (menu_soup.find("div", class_="summary_image"))
+    thumbnail_text = str(thumbnail_text.find("img")).split('"')[5]
+    print(thumbnail_text)
+    return(thumbnail_text)
+
+
+
+    #embed = discord.Embed(title=f"{Title}", url=f"{urlbasic}",
+    #                      description=f"The Chapter {chapter_number} \n " + message_release + f"\n Link to latest chapter: {urlchapter}",
+    #                      color=discord.Color.from_rgb(r1, g, b))
+    #embed.set_image(url=f"{url_thumbnail}")
+    #return embed, chapter_number
 
 # <@401845652541145089>
 
