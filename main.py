@@ -20,7 +20,7 @@ with open('chapters_listed', 'r') as r:
     for line in r:
         if line is not None:
             manhwas.append(line)
-print(manhwas)
+
 cmds = []
 count = 0
 for line in manhwas:
@@ -44,6 +44,11 @@ async def m(ctx, arg):
                 if source == 'Reaper_Scans':
                     embed = \
                         getReaperScans(manhwa[1], manhwa[3], manhwa[4], int(manhwa[5]), int(manhwa[6]), int(manhwa[7]),
+                                       int(manhwa[8]), int(manhwa[9]), int(manhwa[10]))[0]
+                    await ctx.send(embed=embed)
+                elif source == 'MangaClash':
+                    embed = \
+                        getMangaClash(manhwa[1], manhwa[3], manhwa[4], int(manhwa[5]), int(manhwa[6]), int(manhwa[7]),
                                        int(manhwa[8]), int(manhwa[9]), int(manhwa[10]))[0]
                     await ctx.send(embed=embed)
                 else:
@@ -184,7 +189,6 @@ async def myLoop():
                 line_ = line.split('-')
                 last_chapters.setdefault(line_[0], line_[1])
             # Title Source  url  url_chapter r g b rHour rMinute rDay
-
     content = []
     subscription = []
     with open('chapters_latest.txt', 'r') as f:
@@ -317,6 +321,8 @@ def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
     chapter_text = str(chapter.find("p", class_="chapter-manhwa-title")).split()
     chapter_number = float(str(chapter_text[2]).split('<')[0])
 
+
+
     # Now I have the number as well
 
     if chapter_number == round(chapter_number,0):
@@ -432,6 +438,70 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
 
 # Manga Clash
 
+def getMangaClash(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
+
+    '''
+        Thumbnail:  Y
+        CHAPTER_NUMBER: Y
+        URL_CHAPTER: Y
+        CHECK_RELEASES: Y
+    '''
+
+    # Now get the time of release and if it already was released today or not
+
+    web = req.get(url=f"{urlbasic}")
+    menu_soup = bs(web.content, features="html.parser")
+    chapter_text = (menu_soup.find("li", class_="wp-manga-chapter"))
+    chapter_text = str(chapter_text.find("a"))
+    chapter_text = chapter_text.split(">")[1]
+    chapter_number = float(chapter_text.replace("</a", "").split(" ")[1])
+    # now we have chapter_number
+
+
+    # Mow I need the second chapter release date
+
+    chapter_second = str(menu_soup.find_all("li", class_="wp-manga-chapter")[1])
+    print(chapter_second)
+    chapter_second = chapter_second.split('>')[5]
+    chapter_second = chapter_second.split('<')[0]
+    date_text = chapter_second
+
+    # Returns the time until release
+    until_release = getTime(rHour, rMin, rDay)
+
+
+    # Now I will add the number of chapter to the url of chapter
+    if chapter_number == int(chapter_number):
+        urlchapter = str(urlchapter) + f'{int(chapter_number)}/'
+        # It is a full number
+    else:
+        m_chapter_number = str(chapter_number).replace(".",'-')
+        urlchapter = str(urlchapter)+f'{m_chapter_number}/'
+    # Now I have the URL for the chapter
+
+    # now I need the chapter_thumbnail
+    thumbnail_text = (menu_soup.find("div", class_="summary_image"))
+    thumbnail_text = str(thumbnail_text.find("img")).split('"')[5]
+    url_thumbnail = thumbnail_text
+
+    next_chapter = chapter_number+1
+
+    # Check if the last_chapters has the  current chapter number, if does it has not been released yet
+    if last_chapters[Title] == chapter_number:
+        released = False
+    else:
+        released = True
+
+    if until_release[1] is True and released is True:
+        message_release = f'The Chapter {int(next_chapter)} is being translated \n or is on break or has random releases'
+    else:
+        message_release = f'The Chapter {next_chapter} will be released in {until_release[0]}'
+    embed = discord.Embed(title=f"{Title}", url=f"{urlbasic}",
+                          description=f"The Chapter {chapter_number} \n " + message_release + f"\n Link to latest chapter: {urlchapter}",
+                          color=discord.Color.from_rgb(r1, g, b))
+    embed.set_image(url=f"{url_thumbnail}")
+    return embed, chapter_number
+
 def getMangaClashReleased(Title, urlbasic, urlchapter, r1, g, b):
 
     '''
@@ -492,8 +562,45 @@ def getMangaClashReleased(Title, urlbasic, urlchapter, r1, g, b):
     return embed, chapter_number, chapter_last_number
     # New chapter was RELEASED!!!!
 
+# 1st Kiss
+
+def get1stKiss(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
+    print("")
+
+def get1stKissReleased(Title, urlbasic, urlchapter, r1, g, b):
+    print("")
+# Aqua Manga
+
+def getAquaManga(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
+    print("")
+
+def getAguaMangaReleased(Title, urlbasic, urlchapter, r1, g, b):
+    print("")
+
+# 365Manga
+
+def get365Manga(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
+    print("")
+
+def get365MangaReleased(Title, urlbasic, urlchapter, r1, g, b):
+    print("")
+
+# 247Manga
+
+def get247Manga(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
+    print("")
+
+def get247MangaReleased(Title, urlbasic, urlchapter, r1, g, b):
+    print("")
 
 
+# Webtoons.com
+
+def getWebtoons(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
+    print("")
+
+def getWebtoonsReleased(Title, urlbasic, urlchapter, r1, g, b):
+    print("")
 
 
 # <@401845652541145089>
