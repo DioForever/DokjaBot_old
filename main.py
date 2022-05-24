@@ -9,9 +9,8 @@ from discord.ext import commands
 
 bot = commands.Bot(command_prefix="!")
 
-last_chapters = {
 
-}
+last_chapters = {}
 content = []
 # await bot.wait_until_ready()
 print("DokjaBot activated")
@@ -59,7 +58,8 @@ async def m(ctx, arg):
                               color=discord.Color.from_rgb(246, 214, 4))
         await ctx.send(embed=embed)
     elif arg == "test":
-        await ctx.send(getMangaClash("The Beginning After The End","https://mangaclash.com/manga/the-beginning-after-the-end/","https://mangaclash.com/manga/the-beginning-after-the-end/chapter-", 0,0,0,0,0,0))
+        embed = getMangaClashReleased("The Beginning After The End","https://mangaclash.com/manga/the-beginning-after-the-end/","https://mangaclash.com/manga/the-beginning-after-the-end/chapter-", 0,0,0)[0]
+        await ctx.send(embed = embed)
 
 
 @bot.command()
@@ -221,20 +221,48 @@ async def myLoop():
                     await channel.send(embed=embed)
                     await channel.send(f'Ping of The {line[1]} {number_current_chapter}: {subscription}',
                                        delete_after=3)
-                with open('chapters_latest.txt', 'w') as wf:
-                    # Check if there are some that have to be updated
-                    for c in content:
-                        for c_ in content_new:
-                            cs = c.split('-')[0]
-                            cs_ = c_.split('-')[0]
-                            if cs_ == cs:
-                                   content.remove(c)
+            elif line[2] == 'MangaClash':
+                number_current_chapter = float(
+                    getMangaClashReleased(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]))[1])
+                # number_last_chapter = float(getMangaClashReleased(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]))[2])
+                if not last_chapters.keys().__contains__(line[1]):
+                    number_last_chapter = number_current_chapter - 1
+                    contains = False
+                else:
+                    number_last_chapter = float(str(last_chapters[line[1]]).split(" ")[0])
+                    contains = True
+                if number_last_chapter < number_current_chapter:
+                    # New chapter was released!
+                    if not last_chapters.keys().__contains__(line[1]):
+                        last_chapter_number = number_current_chapter - 1
+                        contains = False
+                    else:
+                        last_chapter_number = last_chapters[line[1]]
+                        contains = True
+                    if contains is True:
+                        last_chapters[line[1]] = number_current_chapter
+                        content_new.append(f"{line[1]}-{number_current_chapter}")
+                    else:
+                        content_new.append(f"{line[1]}-{number_current_chapter}")
+                    embed = getMangaClashReleased(line[1], line[3], line[4], int(line[5]), int(line[6]),
+                                                   int(line[7]))[0]
+                    await channel.send(embed=embed)
+                    await channel.send(f'Ping of The {line[1]} {number_current_chapter}: {subscription}',
+                                       delete_after=3)
+    with open('chapters_latest.txt', 'w') as wf:
+        # Check if there are some that have to be updated
+        for c in content:
+            for c_ in content_new:
+                cs = c.split('-')[0]
+                cs_ = c_.split('-')[0]
+                if cs_ == cs:
+                    content.remove(c)
 
-                    # Write it down
-                    for c in content_new:
-                        wf.write(c + " \n")
-                    for c in content:
-                        wf.write(c)
+        # Write it down
+        for c in content_new:
+            wf.write(c + " \n")
+        for c in content:
+            wf.write(c)
 
     # Save the last_chapters to the chapters_latest.txt file
 
@@ -273,6 +301,7 @@ def getTime(rHour, rMinute, rDay):
 
     return message_finall, negative
 
+# Reaper Scans
 
 def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
     web = req.get(url=urlbasic)
@@ -307,7 +336,6 @@ def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
     digit = (date_second_chapter.split())
     digit = (digit[1])
     if digit.isalpha():
-        print(digit)
         d = datetime.date(datetime.today())
         d = d.strftime('%d')
         digit= int(d)
@@ -375,7 +403,7 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
             # Title Source  url  url_chapter r g b rHour rMinute rDay
 
 
-    chapters_released = ""
+    chapters_released = chapter_number
     if not last_chapters.__contains__(Title):
         last_chapter_number = chapter_number - 1
     else:
@@ -404,28 +432,69 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b):
 
 # Manga Clash
 
-def getMangaClash(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
+def getMangaClashReleased(Title, urlbasic, urlchapter, r1, g, b):
+
+    '''
+        Thumbnail:  Y
+        CHAPTER_NUMBER: Y
+        URL_CHAPTER: Y
+        CHECK_RELEASES: Y
+    '''
+
+    # Now get the time of release and if it already was released today or not
+
     web = req.get(url=f"{urlbasic}")
     menu_soup = bs(web.content, features="html.parser")
     chapter_text = (menu_soup.find("li", class_="wp-manga-chapter"))
     chapter_text = str(chapter_text.find("a"))
     chapter_text = chapter_text.split(">")[1]
-    chapter_number = chapter_text.replace("</a","").split(" ")[1]
+    chapter_number = float(chapter_text.replace("</a", "").split(" ")[1])
     # now we have chapter_number
+
+    # Now I will add the number of chapter to the url of chapter
+    if chapter_number == int(chapter_number):
+        urlchapter = str(urlchapter) + f'{int(chapter_number)}/'
+        # It is a full number
+    else:
+        m_chapter_number = str(chapter_number).replace(".",'-')
+        urlchapter = str(urlchapter)+f'{m_chapter_number}/'
+    # Now I have the URL for the chapter
 
     # now I need the chapter_thumbnail
     thumbnail_text = (menu_soup.find("div", class_="summary_image"))
     thumbnail_text = str(thumbnail_text.find("img")).split('"')[5]
-    print(thumbnail_text)
-    return(thumbnail_text)
+    url_thumbnail = thumbnail_text
+    if last_chapters.keys().__contains__(Title):
+        chapter_last_number = float(last_chapters.get(Title))
+        # It has last chapter, so chose the last chapter
+    else:
+        chapter_last_number = chapter_number-1
+        # It doesnt have chapter, so set it as empty
+    if chapter_number-chapter_last_number <= 1.0 and not 0.0:
+        m_chapter_number =  chapter_number
+    elif chapter_number-chapter_last_number > 1.0:
+        chapters_released = list(range(int(chapter_last_number)+1, int(chapter_number)))
+        m_chapter_number = ""
+        for numbers in chapters_released:
+            numbers = int(numbers)
+            m_chapter_number += f'{str(numbers)}'
+        # Now I have the list of all released chapters
 
 
 
-    #embed = discord.Embed(title=f"{Title}", url=f"{urlbasic}",
-    #                      description=f"The Chapter {chapter_number} \n " + message_release + f"\n Link to latest chapter: {urlchapter}",
-    #                      color=discord.Color.from_rgb(r1, g, b))
-    #embed.set_image(url=f"{url_thumbnail}")
-    #return embed, chapter_number
+    # Its more than 1 chapter
+
+
+    embed = discord.Embed(title=f"{Title}", url=f"{urlbasic}",
+                      description=f"The Chapter {m_chapter_number} was released! " + f"\n Link to latest chapter: {urlchapter}",
+                      color=discord.Color.from_rgb(r1, g, b))
+    embed.set_image(url=f"{url_thumbnail}")
+    return embed, chapter_number, chapter_last_number
+    # New chapter was RELEASED!!!!
+
+
+
+
 
 # <@401845652541145089>
 
