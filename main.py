@@ -146,10 +146,11 @@ async def supl(ctx):
                 await ctx.send(messageToSend)
 
 
+
 @bot.command()
 async def m_subscribe_all(ctx):
     subscription_all = []
-    with open('chapters_release_ping', 'r') as f:
+    with open('server_release_ping.txt', 'r') as f:
         for line in f:
             subscription_all.append(line)
     # Now check if user is in the list
@@ -194,99 +195,8 @@ async def chapterReleaseCheck():
                         embed = getReaper[1]
                         channel = bot.get_channel(int(id_channel))
                         await channel.send(embed=embed)
-
-
-'''@tasks.loop(seconds=60)  # repeat after every 10 seconds
-async def myLoop():
-    await bot.wait_until_ready()
-    channel = bot.get_channel(977231331199164466)
-
-    with open('server_latest.txt', 'r') as f:
-        for line in f:
-            if line is not None:
-                line_ = line.split('-')
-                last_chapters.setdefault(line_[1], line_[2])
-            # Title Source  url  url_chapter r g b rHour rMinute rDay
-    content = []
-    subscription = []
-    with open('chapters_latest.txt', 'r') as f:
-        for line in f:
-            content.append(line)
-
-    with open('chapters_release_ping', 'r') as f:
-        for line in f:
-            subscription.append(line)
-    content_new = []
-
-    with open('chapters_listed', 'r') as r:
-        for line in r:
-            # Get the released chapter as Name-number_chapter
-            line = line.split("  ")
-            if line[2] == 'Reaper_Scans':
-                number_current_chapter = \
-                    float(getReaperScans(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]),
-                                         int(line[8]), int(line[9]), int(line[10]))[1])
-                if not last_chapters.keys().__contains__(line[1]):
-                    last_chapter_number = number_current_chapter - 1
-                    contains = False
-                else:
-                    last_chapter_number = last_chapters[line[1]]
-                    contains = True
-                last_chapter_number = float(last_chapter_number)
-                if (last_chapter_number) < number_current_chapter:
-                    if contains is True:
-                        last_chapters[line[1]] = number_current_chapter
-                        content_new.append(f"{line[1]}-{number_current_chapter}")
-                    else:
-                        content_new.append(f"{line[1]}-{number_current_chapter}")
-                    embed = getReaperScansReleased(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]))
-                    await channel.send(embed=embed)
-                    await channel.send(f'Ping of The {line[1]} {number_current_chapter}: {subscription}',
-                                       delete_after=3)
-            elif line[2] == 'MangaClash':
-                number_current_chapter = float(
-                    getMangaClashReleased(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]))[1])
-                # number_last_chapter = float(getMangaClashReleased(line[1], line[3], line[4], int(line[5]), int(line[6]), int(line[7]))[2])
-                if not last_chapters.keys().__contains__(line[1]):
-                    number_last_chapter = number_current_chapter - 1
-                    contains = False
-                else:
-                    number_last_chapter = float(str(last_chapters[line[1]]).split(" ")[0])
-                    contains = True
-                if number_last_chapter < number_current_chapter:
-                    # New chapter was released!
-                    if not last_chapters.keys().__contains__(line[1]):
-                        last_chapter_number = number_current_chapter - 1
-                        contains = False
-                    else:
-                        last_chapter_number = last_chapters[line[1]]
-                        contains = True
-                    if contains is True:
-                        last_chapters[line[1]] = number_current_chapter
-                        content_new.append(f"{line[1]}-{number_current_chapter}")
-                    else:
-                        content_new.append(f"{line[1]}-{number_current_chapter}")
-                    embed = getMangaClashReleased(line[1], line[3], line[4], int(line[5]), int(line[6]),
-                                                   int(line[7]))[0]
-                    await channel.send(embed=embed)
-                    await channel.send(f'Ping of The {line[1]} {number_current_chapter}: {subscription}',
-                                       delete_after=3)
-    with open('chapters_latest.txt', 'w') as wf:
-        # Check if there are some that have to be updated
-        for c in content:
-            for c_ in content_new:
-                cs = c.split('-')[0]
-                cs_ = c_.split('-')[0]
-                if cs_ == cs:
-                    content.remove(c)
-
-        # Write it down
-        for c in content_new:
-            wf.write(c + " \n")
-        for c in content:
-            wf.write(c)
-
-    # Save the last_chapters to the chapters_latest.txt file'''
+                        await channel.send(f'>>> Ping of The {title} {getReaper[3]}: {getReaper[2]}',
+                                           delete_after=8)
 
 
 def getTime(rHour, rMinute, rDay):
@@ -391,9 +301,21 @@ def getReaperScans(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
 def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b, id_channel, id_guild):
     content = []
     subscription = []
-    with open('chapters_release_ping', 'r') as f:
+    with open('server_release_ping.txt', 'r') as f:
         for line in f:
-            subscription.append(line)
+            line_ = line.split("-")
+            if line_[0] == id_guild:
+                if line_[1] == Title:
+                    # Now I just need to get the list of player
+                    test = line_[2].replace("[",'')
+                    test = str(test.replace("]",''))
+                    test = list(test.split(','))
+                    if len(test)>1:
+                        for t in test:
+                            if t != '':
+                                subscription.append(t)
+                    else:
+                        subscription.append(test)
 
     web = req.get(url=urlbasic)
     chapter_number = float(0)
@@ -484,7 +406,7 @@ def getReaperScansReleased(Title, urlbasic, urlchapter, r1, g, b, id_channel, id
         for c in content:
             wf.write(c)
 
-    return released, embed
+    return released, embed, subscription, chapter_number
 
 
 # Manga Clash
