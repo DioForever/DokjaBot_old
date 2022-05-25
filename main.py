@@ -618,7 +618,6 @@ def get1stKiss(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
 def get1stKissReleased(Title, urlbasic, urlchapter, r1, g, b):
     print("")
 
-
 # Aqua Manga
 
 def getAquaManga(Title, urlbasic, urlchapter, r1, g, b, rHour, rMin, rDay):
