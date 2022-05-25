@@ -12,7 +12,7 @@ bot = commands.Bot(command_prefix="!")
 content = []
 # await bot.wait_until_ready()
 print("DokjaBot activated")
-
+refreshing = False
 count = 0
 
 
@@ -163,6 +163,8 @@ async def m_subscribe_all(ctx):
 @tasks.loop(seconds=60)
 async def chapterReleaseCheck():
     await bot.wait_until_ready()
+    print('Refreshing releases status: Starting')
+
     # I need to get the chapters latest from the server.latest
     chapters_released = {}
     with open('server_latest.txt', 'r') as r_sl:
@@ -197,7 +199,7 @@ async def chapterReleaseCheck():
                         await channel.send(embed=embed)
                         await channel.send(f'>>> Ping of The {title} {getReaper[3]}: {getReaper[2]}',
                                            delete_after=8)
-
+    print('Refreshing releases status: Finished')
 
 def getTime(rHour, rMinute, rDay):
     date = datetime.today().strftime("%Y-%m-%d")
